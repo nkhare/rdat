@@ -1,18 +1,18 @@
 library(shiny)
 # Set the working directory and list all csv files inside
-av.datasets = list.files(pattern="*csv")
-ops = read.csv("ops.csv")
 
 # Define UI for dataset viewer application
 shinyUI(pageWithSidebar(
 
   # Application title.
-  headerPanel("Volume profile results for different calls - Anshi"),
+  headerPanel("Performance "),
 
   sidebarPanel(
 	wellPanel(
-		selectInput("stat", "Choose a dataset:",choices = ops$stat),
-		numericInput("obs", "Number of observations to view:", 10),
+		selectInput("host", "Select the host:", choices = c("gprfs015", "gprfs016")),
+		#selectInput("stat", "Choose a dataset:",choices = c("CPU", "Memory", "Disk", "XFS")),
+		selectInput("stat", "Choose a dataset:",choices = c("disk.all.read","disk.all.write")),
+#		downloadButton('downloadData', 'Download'),
 		submitButton("Update View")
 	),
 	wellPanel(
@@ -28,9 +28,9 @@ shinyUI(pageWithSidebar(
 	
   mainPanel(
     h4("Average Latency Over runs - grpfs016 Brick"),
-    plotOutput("plot")
+    plotOutput("plot"),
 
-#    h4("Observations"),
- #   tableOutput("view")
+    h4("Observations"),
+   verbatimTextOutput("view")
   )
 ))
