@@ -9,9 +9,12 @@ shinyUI(pageWithSidebar(
 
   sidebarPanel(
 	wellPanel(
-		selectInput("host", "Select the host:", choices = c("gprfs015", "gprfs016")),
+		selectInput("esServer", "Select Elasticsearch Server :", choices = c("perf19.perf.lab.eng.bos.redhat.com")),
+		selectInput("esServerPort", "Select Elasticsearch Server :", choices = c("9200")),
+		selectInput("esIndex", "Select the Elasticsearch index:", choices = c("pcp", "fsync2")),
+		selectInput("host", "Select the host:", choices = c("gprfs016", "gprfs015")),
 		#selectInput("stat", "Choose a dataset:",choices = c("CPU", "Memory", "Disk", "XFS")),
-		selectInput("stat", "Choose a dataset:",choices = c("disk.all.read","disk.all.write")),
+#		selectInput("stat", "Choose a dataset:",choices = c("disk","cpu", "memory","xfs")),
 #		downloadButton('downloadData', 'Download'),
 		submitButton("Update View")
 	),
@@ -27,8 +30,17 @@ shinyUI(pageWithSidebar(
   ),
 	
   mainPanel(
-    h4("Average Latency Over runs - grpfs016 Brick"),
-    plotOutput("plot"),
+    h4("Write and Read IOPs"),
+    plotOutput("plotCpu"),
+
+    h4("CPU usage"),
+    plotOutput("plotDisk"),
+
+    h4("XFS"),
+    plotOutput("plotXfsIops"),
+
+    h4("XFS"),
+    plotOutput("plotXfsAttr"),
 
     h4("Observations"),
    verbatimTextOutput("view")

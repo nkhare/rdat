@@ -13,6 +13,21 @@ shinyServer(function(input, output) {
 		res
 	})
 
+	esServer <- reactive(function() {
+		res = input$esServer 
+		res
+	})
+
+	esPort <- reactive(function() {
+		res = input$esServerPort
+		res
+	})
+	esIndex <- reactive(function() {
+		res = input$esIndex
+		res
+	})
+
+
         # Return the requested stat matrix
 	statMatrix <- reactive(function() {
 	stat = input$stat
@@ -22,7 +37,12 @@ shinyServer(function(input, output) {
 	# Read the content from Elastic Search Server
 	readElasticSearch <- function() {
 		host1 = hostname()
- 		url=paste0("http://perf19.perf.lab.eng.bos.redhat.com:9200/_search?source={%22size%22:3600,%22query%22:{%22bool%22:{%22must%22:[{%22term%22:{%22PS.hostname%22:%22",host1,"%22}}]}},%22sort%22:[{%22timestamp.s%22:{%22order%22:%22asc%22}}]}")
+		elasticServer = esServer()
+		elasticPort = esPort()
+		index = esIndex()
+		cat(elasticPort)
+ 		url=paste0("http://",elasticServer,":",elasticPort,"/",index,"/","/_search?source={%22size%22:3600,%22query%22:{%22bool%22:{%22must%22:[{%22term%22:{%22PS.hostname%22:%22",host1,"%22}}]}},%22sort%22:[{%22timestamp.s%22:{%22order%22:%22asc%22}}]}")
+		cat(url)
 		raw=getURL(url)
 		data=fromJSON(raw)
 		hits=data$hits$hits
@@ -66,18 +86,79 @@ shinyServer(function(input, output) {
 		}
 		values
 	}
+
+	diffList <- function(l) {
+		ldiff = list()
+		l = unlist(l)
+		for (i in 2:length(l)) {ldiff[i-1] = l[[i]] - l[[i-1]] }
+		ldiff
+	}
 	
-	output$plot <- renderPlot({
+	
+	output$plotCpu <- renderPlot({
 		timeseries = getTimestamps()
+		timeseries = timeseries[-1]
 		stat = statMatrix()
 		v = getValues()
-		df <- data.frame(t1=timeseries,y=unlist(v[stat]))	
-		p <- ggplot() + geom_point(aes(x=t1,y=y), df)
+		reads = v["disk.all.read"]
+		reads = diffList(reads)
+		reads = unlist(reads)
+		writes = v["disk.all.write"]
+		writes = diffList(writes)
+		writes = unlist(writes)
+		df <- data.frame(time = timeseries, readsIops = reads, writeIops = writes)
+		p <-  ggplot() + geom_line(aes(time, readsIops, colour="reads"), df) + geom_line(aes(time, writeIops, colour="writes"), df)
 		print(p)
-	  })
+		})
+	output$plotDisk <- renderPlot({
+		timeseries = getTimestamps()
+		timeseries = timeseries[-1]
+		stat = statMatrix()
+		v = getValues()
+		cpuUser = unlist(diffList(v["kernel.all.cpu.user"]))
+		cpuNice = unlist(diffList(v["kernel.all.cpu.nice"]))
+		cpuSys = unlist(diffList(v["kernel.all.cpu.sys"]))
+		cpuIdle = unlist(diffList(v["kernel.all.cpu.idle"]))
+		cpuIntr = unlist(diffList(v["kernel.all.cpu.intr"]))
+		df <- data.frame(time = timeseries, user = cpuUser, nice = cpuNice, sys = cpuSys, idle = cpuIdle, intr = cpuIntr )#, nice = CpuNice)
+		p <- ggplot() + geom_line(aes(time, user, colour="user"), df) + geom_line(aes(time, nice, colour="nice"), df) + geom_line(aes(time, sys, colour="sys"), df) + geom_line(aes(time, idle, colour="idle"), df) + geom_line(aes(time, intr, colour="intr"), df) 
+		print(p)
+	})
 
-#	output$view = renderPrint ({
-#		x = getValues()
-#		x
-#	})
+	output$plotXfsIops <- renderPlot ({
+		timeseries = getTimestamps()
+		timeseries = timeseries[-1]
+		stat = statMatrix()
+		v = getValues()
+		xfsReads = unlist(diffList(v["xfs.read"]))
+		xfsWrites = unlist(diffList(v["xfs.write"]))
+		xfsReadbytes = unlist(diffList(v["xfs.read_bytes"]))
+		xfsWritebytes = unlist(diffList(v["xfs.write_bytes"]))
+		xfsLogWrites = unlist(diffList(v["xfs.log.writes"]))
+		xfsIflush = unlist(diffList(v["xfs.iflush_count"]))
+		df <- data.frame(time = timeseries, readsIops = xfsReads, writeIops = xfsWrites, logWriteIops = xfsLogWrites,  xfsIflushCount = xfsIflush )
+		write.csv(df, "/tmp/xfs.csv")
+		p <-  ggplot() + geom_line(aes(time, readsIops, colour="xfsReads"), df) + geom_line(aes(time, writeIops, colour="xfsWrites"), df) + geom_line(aes(time, logWriteIops, colour="xfsLogWrites"), df) +  geom_line(aes(time, xfsIflushCount, colour="xfsIflush"), df)
+		print(p)
+
+	})
+
+	output$plotXfsAttr <- renderPlot ({
+		timeseries = getTimestamps()
+		timeseries = timeseries[-1]
+		stat = statMatrix()
+		v = getValues()
+		xfsSetattr = unlist(diffList(v["xfs.attr.set"]))
+		xfsGetattr = unlist(diffList(v["xfs.attr.get"]))
+		df <- data.frame(time = timeseries, xfsSetattrCount = xfsSetattr, xfsGetattrCount = xfsGetattr)
+		p <-  ggplot()  + geom_line(aes(time, xfsSetattrCount , colour="xfsSetattr"), df) + geom_line(aes(time, xfsGetattrCount, colour="xfsGetattr"), df) + scale_y_log10() 
+		print(p)
+
+	})
+	output$view = renderPrint ({
+		v = getValues()
+		reads1 = v["xfs.read"]
+		x = unlist(diffList(reads1))
+		cat(x)
+	})
 })
