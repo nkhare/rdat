@@ -1,7 +1,0 @@
-stat,no
-kernel.all.cpu,4
-kernel.all.load,1
-mem.util.used,2
-kernel.all.cpu.sys,3
-disk.all.write,4
-disk.all.read,5
