@@ -11,10 +11,8 @@ shinyUI(pageWithSidebar(
 	wellPanel(
 		selectInput("esServer", "Select Elasticsearch Server :", choices = c("perf19.perf.lab.eng.bos.redhat.com")),
 		selectInput("esServerPort", "Select Elasticsearch Server :", choices = c("9200")),
-		selectInput("esIndex", "Select the Elasticsearch index:", choices = c("pcp", "fsync2")),
+		selectInput("esIndex", "Select the Elasticsearch index:", choices = c("test", "pcp", "fsync2", "fsync2nobarrier")),
 		selectInput("host", "Select the host:", choices = c("gprfs016", "gprfs015")),
-		#selectInput("stat", "Choose a dataset:",choices = c("CPU", "Memory", "Disk", "XFS")),
-#		selectInput("stat", "Choose a dataset:",choices = c("disk","cpu", "memory","xfs")),
 #		downloadButton('downloadData', 'Download'),
 		submitButton("Update View")
 	),
@@ -30,19 +28,29 @@ shinyUI(pageWithSidebar(
   ),
 	
   mainPanel(
-    h4("Write and Read IOPs"),
-    plotOutput("plotCpu"),
+    h4("Disk Throughput MB/s"),
+    plotOutput("plotDiskThroughput"),
+#    downloadButton("downloadDiskThroughputData", "Download Disk Throughput Data"),
 
-    h4("CPU usage"),
+    h4("XFS Throughput MB/s"),
+    plotOutput("plotXfsThroughput"),
+
+    h4("Disk Write and Read IOPs"),
     plotOutput("plotDisk"),
 
-    h4("XFS"),
+    h4("XFS - Filesystem IOPS"),
     plotOutput("plotXfsIops"),
 
-    h4("XFS"),
+    h4("XFS Set/Get Xattr"),
     plotOutput("plotXfsAttr"),
 
-    h4("Observations"),
-   verbatimTextOutput("view")
+    h4("CPU usage"),
+    plotOutput("plotCpu"),
+
+    h4("Memory Usage"),
+    plotOutput("plotMemory")
+
+ #   h4("Observations"),
+ #   verbatimTextOutput("view")
   )
 ))
