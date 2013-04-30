@@ -11,10 +11,10 @@ shinyUI(pageWithSidebar(
 	wellPanel(
 		selectInput("esServer", "Select Elasticsearch Server :", choices = c("perf19.perf.lab.eng.bos.redhat.com")),
 		selectInput("esServerPort", "Select Elasticsearch Server :", choices = c("9200")),
-		selectInput("esIndex", "Select the Elasticsearch index:", choices = c("test", "pcp", "fsync2", "fsync2nobarrier")),
-		selectInput("host", "Select the host:", choices = c("gprfs016", "gprfs015")),
+		selectInput("esIndex", "Select the Elasticsearch index:", choices = c("test", "anshi")),
+		selectInput("host", "Select the host:", choices = c("gprfs016", "gprfs015"))
 #		downloadButton('downloadData', 'Download'),
-		submitButton("Update View")
+#		submitButton("Update View")
 	),
 	wellPanel(
 		h4("Configuration and Workload"),

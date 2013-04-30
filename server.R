@@ -106,7 +106,7 @@ shinyServer(function(input, output) {
 		mbs
 	}
 	
-	output$plotDisk <- renderPlot({
+	output$plotDisk <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
@@ -122,7 +122,7 @@ shinyServer(function(input, output) {
 		print(p)
 		})
 
-	output$plotCpu <- renderPlot({
+	output$plotCpu <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
@@ -138,7 +138,7 @@ shinyServer(function(input, output) {
 		print(p)
 	})
 
-	output$plotXfsIops <- renderPlot({
+	output$plotXfsIops <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
@@ -156,7 +156,7 @@ shinyServer(function(input, output) {
 
 	})
 
-	output$plotXfsAttr <- renderPlot({
+	output$plotXfsAttr <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
@@ -170,7 +170,7 @@ shinyServer(function(input, output) {
 	})
 	
 
-	output$plotMemory <- renderPlot({
+	output$plotMemory <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		stat = statMatrix()
 		v = getValues()
@@ -190,7 +190,7 @@ shinyServer(function(input, output) {
 	})	
 
 
-	output$plotXfsThroughput <- renderPlot({
+	output$plotXfsThroughput <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
@@ -204,7 +204,7 @@ shinyServer(function(input, output) {
 		print(p)
 	})
 
-	output$plotDiskThroughput <- renderPlot({
+	output$plotDiskThroughput <- reactivePlot( function(){
 		timeseries = getTimestamps()
 		timeseries = timeseries[-1]
 		stat = statMatrix()
