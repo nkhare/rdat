@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import urllib2
 import json
 import time
@@ -18,6 +20,12 @@ pmwebServer = config.get('PMWEB', 'pmwebServer')
 pmwebPort = config.get('PMWEB', 'pmwebPort')
 
 INDEX = config.get('ELASTICSEARCH', 'INDEX')
+if len(sys.argv) > 1:
+	INDEX = str(sys.argv[1]).lower()
+
+
+print INDEX
+
 DOCTYPE = config.get('ELASTICSEARCH', 'DOCTYPE')
 
 hostname = config.get('PCP', 'hostname')
@@ -26,6 +34,8 @@ cpuStats = config.get('PCP','cpuStats')
 memStats = config.get('PCP', 'memStats')
 diskStats = config.get('PCP', 'diskStats')
 xfsStats = config.get('PCP', 'xfsStats')
+netStats = config.get('PCP', 'netStats')
+
 
 interval = float(config.get('RUNCONFIG', 'interval'))
 stopfile = config.get('RUNCONFIG', 'stopfile')
@@ -34,7 +44,7 @@ esServer = "http://" + esServer + ":" + esServerPort + "/"
 print esServer
 es = ElasticSearch(esServer)
 
-stats = hostname + diskStats  + kernelStats + cpuStats + memStats + xfsStats
+stats = hostname + diskStats  + kernelStats + cpuStats + memStats + xfsStats + netStats
 
 servers = []
 s = config.options('SERVERS')
