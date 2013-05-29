@@ -23,3 +23,12 @@ class pmweb:
 		res = json.loads(res)
 		return res
 		pass
+
+
+	def getName(self, context, name):
+		url = "http://" + self.host + ":" + str(self.port) + "/pmapi/" + context + "/_indom?name=" + name + "&instance=" + "3"
+		print  url
+		response = urllib2.urlopen(url)
+		res = response.read()
+		res = json.loads(res)
+		return res
